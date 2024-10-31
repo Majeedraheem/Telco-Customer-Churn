@@ -1,23 +1,15 @@
-import joblib
-import pandas as pd
+# app.py
 from flask import Flask, request, jsonify
-
-# Load the saved model pipeline
-model = joblib.load('logistic_regression_model.pkl')
+from model import model_instance  # Import the model
 
 app = Flask(__name__)
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Parse the JSON data
-    data = request.json
-    df = pd.DataFrame(data)
-    
-    # Make predictions
-    predictions = model.predict(df)
-    
-    # Return predictions as JSON
-    return jsonify(predictions.tolist())
+    data = request.get_json()  # Get JSON data
+    features = data['features']
+    prediction = model_instance.predict([features])  # Make a prediction
+    return jsonify({'prediction': int(prediction[0])})  # Return prediction
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
